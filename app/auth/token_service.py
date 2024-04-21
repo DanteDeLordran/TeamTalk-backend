@@ -1,4 +1,4 @@
-from ..models.user import User, parse_user_from_mongo_dict
+from ..models.dto.user_at_client import UserClient, parse_user_from_mongo_dict
 from dotenv import load_dotenv
 from jose import jwt
 import os
@@ -10,7 +10,7 @@ load_dotenv()
 super_secret_key = os.getenv("SUPER_SECRET_KEY")
 
 
-def get_user_token(user: User) -> str:
+def get_user_token(user: UserClient) -> str:
     expiration = datetime.now() + timedelta(days=7)
 
     data_in_token = {
@@ -27,7 +27,7 @@ def get_user_token(user: User) -> str:
     return token
 
 
-def authenticate(token: str) -> User | None:
+def authenticate(token: str) -> UserClient | None:
     claims = jwt.decode(token=token, key=super_secret_key)
     username = claims["username"]
     email = claims["email"]

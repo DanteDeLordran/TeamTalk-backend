@@ -3,6 +3,7 @@ from starlette.status import *
 from ...models.user import User, parse_user_from_mongo_dict
 from ...models.dto.user_register import UserRegister, build_user_from_register
 from ...models.dto.user_login import UserLogin, build_login_dict
+from ...models.dto.user_at_client import UserClient, parse_user_from_mongo_dict
 from ...db.db_context import db
 from ...auth.token_service import get_user_token, authenticate
 
