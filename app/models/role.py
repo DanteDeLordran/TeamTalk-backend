@@ -6,7 +6,8 @@ class Role(BaseModel):
     
 
 def parse_role_from_mongo_dict(role: dict) -> Role:
-    role_obj = Role()
-    role_obj.id = role["_id"]
-    role_obj .name = role["name"]
+    role_obj = Role(
+        id = role["_id"],
+        name = role["name"]
+    )
     return role_obj
