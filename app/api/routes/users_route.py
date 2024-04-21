@@ -4,6 +4,7 @@ from ...models.user import User, parse_user_from_mongo_dict
 from ...models.dto.user_register import UserRegister, build_user_from_register
 from ...models.dto.user_login import UserLogin, build_login_dict
 from ...db.db_context import db
+from ...auth.token_service import get_user_token
 
 users_route = APIRouter()
 
@@ -25,4 +26,5 @@ def login(userLogin: UserLogin):
     if matched_user == None:
         return Response(status_code=HTTP_404_NOT_FOUND)
     user = parse_user_from_mongo_dict(matched_user)
-    return user
+    token = get_user_token(user)
+    return token
