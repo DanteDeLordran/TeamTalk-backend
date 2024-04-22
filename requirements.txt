@@ -9,7 +9,6 @@ python-multipart==0.0.9
 motor==3.3.2
 starlette==0.36.3
 uvicorn==0.28.0
-passlib==1.7.4aiofiles==23.2.1
 alembic==1.13.1
 annotated-types==0.6.0
 anyio==4.3.0
