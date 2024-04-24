@@ -1,7 +1,6 @@
 from fastapi import FastAPI
-from fastapi.responses import RedirectResponse
-from .api.routes.users_route import users_route
+from app.api.main import router
 
 app = FastAPI()
 
-app.include_router(prefix="/users", router=users_route)
+app.include_router(router)

@@ -10,7 +10,7 @@ from ...auth.token_service import get_user_token, authenticate
 users_route = APIRouter()
 
 # Register a new user
-@users_route.post('/register', tags=['users'])
+@users_route.post('/register')
 def register(userRegister: UserRegister):
     matching_user = db.users.find_one(
         {"$or":[{"email": userRegister.email}, {"username": userRegister.username}]})
@@ -22,7 +22,7 @@ def register(userRegister: UserRegister):
     return Response(status_code=HTTP_204_NO_CONTENT, content="USER_CREATED")
 
 # Login and get token
-@users_route.post('/login', tags=['users'])
+@users_route.post('/login')
 def login(userLogin: UserLogin):
     login_dict = build_login_dict(userLogin)
     matched_user = db.users.find_one(login_dict)
@@ -35,7 +35,7 @@ def login(userLogin: UserLogin):
     return token
 
 # Authenticate from token
-@users_route.get('/authenticate', tags=['users'])
+@users_route.get('/authenticate')
 def auth(token: str = Header(default=None)):
     if token == None:
         return Response(status_code=HTTP_400_BAD_REQUEST, content="NOT_GIVEN_TOKEN")
