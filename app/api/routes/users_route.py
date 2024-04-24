@@ -19,7 +19,7 @@ def register(userRegister: UserRegister):
         return Response(status_code=HTTP_400_BAD_REQUEST, content="USER_EXISTS")
     
     db.users.insert_one(build_user_from_register(userRegister))
-    return Response(status_code=HTTP_204_NO_CONTENT, content="USER_CREATED")
+    return Response(status_code=HTTP_204_NO_CONTENT)
 
 # Login and get token
 @users_route.post('/login')
