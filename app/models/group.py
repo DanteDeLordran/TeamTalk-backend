@@ -1,4 +1,5 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from typing import Optional
 from datetime import datetime
 from .user_participant import UserParticipant, parse_participant_from_mongo_dict
 from .role_definition import RoleDefinition, parse_role_from_mongo_dict
@@ -7,14 +8,14 @@ from .normal_participant import NormalParticipant
 
 
 class Group(BaseModel):
-    id: str | None
+    id: Optional[str] = None
     name: str
-    members: list[UserParticipant]
-    roles: list[RoleDefinition] = [
+    members: list[UserParticipant] = Field(default=[])
+    roles: list[RoleDefinition] = Field(default=[
         Admin(),
         NormalParticipant()
-    ]
-    creationDate: datetime = datetime.now()
+    ])
+    creationDate: datetime = Field(default=datetime.now())
 
 
 def parse_group_from_mongo_dict(group: dict) -> Group:
@@ -28,3 +29,10 @@ def parse_group_from_mongo_dict(group: dict) -> Group:
     )
 
     return group_obj
+
+def parse_group_to_mongo_dict(group: Group) -> dict:
+    group_dict = group.model_dump()
+    del group_dict["id"]
+
+    group_dict["creationDate"] = datetime.isoformat(group.creationDate)
+    return group_dict
