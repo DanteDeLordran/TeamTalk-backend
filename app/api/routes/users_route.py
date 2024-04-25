@@ -47,6 +47,17 @@ def register(userRegister: UserRegister):
 @users_route.post('/login')
 def login(userLogin: UserLogin):
     login_dict = build_login_dict(userLogin)
+    
+    if not email_validator(userLogin.email):
+        return Response(status_code=HTTP_400_BAD_REQUEST,
+                        media_type='application/json',
+                        content=json.dumps({"message": "NOT_VALID_EMAIL"}))
+    
+    if not password_validator(userLogin.password):
+        return Response(status_code=HTTP_400_BAD_REQUEST,
+                        media_type='application/json',
+                        content=json.dumps({"message": "NOT_VALID_PASSWORD"}))
+
     matched_user = db.users.find_one(login_dict)
 
     if matched_user == None:
