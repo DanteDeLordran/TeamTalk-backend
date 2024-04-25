@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Response, Header
 from starlette.status import *
-from ...models.user import User, parse_user_from_mongo_dict
+from ...models.user import parse_user_from_mongo_dict
 from ...models.dto.user_register import UserRegister, build_user_from_register
 from ...models.dto.user_login import UserLogin, build_login_dict
 from ...models.dto.user_at_client import parse_user_from_mongo_dict
@@ -33,8 +33,6 @@ def login(userLogin: UserLogin):
     user = parse_user_from_mongo_dict(matched_user)
     token = get_user_token(user)
     return token
-
-# Authenticate from token
 
 
 @users_route.get('/authenticate')
