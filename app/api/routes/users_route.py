@@ -8,6 +8,7 @@ from ...db.db_context import db
 from ...auth.token_service import get_user_token, authenticate
 from ..services.validators import email_validator, password_validator
 import json
+from ..services.default_returns import not_valid_token, not_given_token
 
 users_route = APIRouter()
 
@@ -71,15 +72,11 @@ def login(userLogin: UserLogin):
 @users_route.get('/authenticate')
 def auth(token: str = Header(default=None)):
     if token == None:
-        return Response(status_code=HTTP_400_BAD_REQUEST,
-                        media_type='application/json',
-                        content=json.dumps({"message": "NOT_GIVEN_TOKEN"}))
+        return not_given_token()
 
     user_result = authenticate(token)
     if user_result == None:
-        return Response(status_code=HTTP_400_BAD_REQUEST,
-                        media_type='application/json',
-                        content=json.dumps({"message": "INVALID_TOKEN"}))
+        return not_valid_token()
 
     return user_result
 

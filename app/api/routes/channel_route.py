@@ -4,6 +4,7 @@ from ...db.db_context import db
 from ...auth.token_service import authenticate
 from ...models.channel import Channel, parse_channel_to_mongo_dict, parse_channel_from_mongo_dict
 import json
+from ..services.default_returns import not_given_token, not_valid_token
 from bson import ObjectId
 
 channel_route = APIRouter()
@@ -11,15 +12,11 @@ channel_route = APIRouter()
 @channel_route.post('/create')
 def create_channer(channel: Channel, token: str = Header(default=None)):
     if token == None:
-        return Response(status_code=HTTP_400_BAD_REQUEST,
-                        media_type='application/json',
-                        content=json.dumps({"message": "NOT_GIVEN_TOKEN"}))
+        return not_given_token()
 
     user = authenticate(token)
     if user == None:
-        return Response(status_code=HTTP_400_BAD_REQUEST,
-                        media_type='application/json',
-                        content=json.dumps({"message": "NOT_VALID_TOKEB"}))
+        return not_valid_token()
     
     matching_channel_on_group = db.channels.find_one({"group_id": channel.group_id, "channel_name": channel.channel_name})
     if matching_channel_on_group != None:
@@ -38,16 +35,12 @@ def create_channer(channel: Channel, token: str = Header(default=None)):
 @channel_route.get('/All/{group_id}')
 def get_all_channel_withing_group(group_id: str, token: str = Header(default=None)):
     if token == None:
-        return Response(status_code=HTTP_400_BAD_REQUEST,
-                        media_type='application/json',
-                        content=json.dumps({"message": "NOT_GIVEN_TOKEN"}))
+        return not_given_token()
     
     user = authenticate(token)
 
     if user == None:
-        return Response(status_code=HTTP_400_BAD_REQUEST,
-                        media_type='application/json',
-                        content=json.dumps({"message": "NOT_VALID_TOKEN"}))
+        return not_valid_token()
     
     channels = list(db.channels.find({"group_id": group_id}))
 
