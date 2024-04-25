@@ -1,8 +1,8 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class RoleDefinition(BaseModel):
-    rolename: str
+    rolename: str = Field(default="Unnamed Role")
 
     # basic permissions for social interaction
     can_send_messages: bool = False
@@ -23,6 +23,7 @@ class RoleDefinition(BaseModel):
 
 def parse_role_from_mongo_dict(role: dict) -> RoleDefinition:
     role_obj = RoleDefinition(
+        rolename=role["rolename"],
         can_send_messages=role["can_send_messages"],
         can_delete_messages=role["can_delete_messages"],
         can_modify_messages=role["can_modify_messages"],
