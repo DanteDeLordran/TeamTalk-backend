@@ -6,6 +6,7 @@ from ...models.dto.user_login import UserLogin, build_login_dict
 from ...models.dto.user_at_client import parse_user_from_mongo_dict
 from ...db.db_context import db
 from ...auth.token_service import get_user_token, authenticate
+import json
 
 users_route = APIRouter()
 
@@ -16,7 +17,9 @@ def register(userRegister: UserRegister):
         {"$or": [{"email": userRegister.email}, {"username": userRegister.username}]})
 
     if matching_user != None:
-        return Response(status_code=HTTP_400_BAD_REQUEST, content="USER_EXISTS")
+        return Response(status_code=HTTP_400_BAD_REQUEST, 
+                        media_type='application/json', 
+                        content=json.dumps({"message": "USER_EXISTS"}))
 
     db.users.insert_one(build_user_from_register(userRegister))
     return Response(status_code=HTTP_204_NO_CONTENT)
@@ -38,8 +41,14 @@ def login(userLogin: UserLogin):
 @users_route.get('/authenticate')
 def auth(token: str = Header(default=None)):
     if token == None:
-        return Response(status_code=HTTP_400_BAD_REQUEST, content="NOT_GIVEN_TOKEN")
+        return Response(status_code=HTTP_400_BAD_REQUEST,
+                        media_type='application/json',
+                        content=json.dumps({"message": "NOT_GIVEN_TOKEN"}))
+
     user_result = authenticate(token)
     if user_result == None:
-        return Response(status_code=HTTP_400_BAD_REQUEST, content="INVALID_TOKEN")
+        return Response(status_code=HTTP_400_BAD_REQUEST,
+                        media_type='application/json',
+                        content=json.dumps({"message": "INVALID_TOKEN"}))
+    
     return user_result
