@@ -2,6 +2,7 @@
 __pycache__
 */__pycache__
 *.db
+**/.vscode
 
 __pycache__
 app.egg-info
