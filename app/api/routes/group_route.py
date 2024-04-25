@@ -50,3 +50,21 @@ def create_group(group: Group, token: str = Header(default=None)):
     group_result = parse_group_from_mongo_dict(db.groups.find_one({"_id": ObjectId(group_id)}))
 
     return group_result
+
+@group_route.get('/All')
+def get_user_groups(token: str = Header(default=None)):
+    if token == None:
+        return Response(status_code=HTTP_400_BAD_REQUEST,
+                        media_type='application/json',
+                        content=json.dumps({"message": "NOT_GIVEN_TOKEN"}))
+    
+    user = authenticate(token)
+    if user == None:
+        return Response(status_code=HTTP_400_BAD_REQUEST,
+                        media_type='application/json',
+                        content=json.dumps({"message": "NOT_VALID_TOKEN"}))
+    
+    groups = list(db.groups.find({"members": {"$elemMatch": {"id": user.id}}}))
+    print(groups)
+    group_objs = [parse_group_from_mongo_dict(group) for group in groups]
+    return [parse_group_to_mongo_dict(group) for group in group_objs]
