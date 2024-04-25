@@ -6,22 +6,19 @@ from ...db.db_context import db
 from ...auth.token_service import authenticate
 from ...models.group import Group, parse_group_from_mongo_dict, parse_group_to_mongo_dict
 from ...models.user_participant import UserParticipant
+from ..services.default_returns import not_given_token, not_valid_token
 
 group_route = APIRouter()
 
 @group_route.post('/create')
 def create_group(group: Group, token: str = Header(default=None)):
     if token == None:
-        return Response(status_code=HTTP_400_BAD_REQUEST,
-                        media_type='application/json',
-                        content=json.dumps({"message": "NOT_GIVEN_TOKEN"}))
+        return not_given_token()
     
     user = authenticate(token)
 
     if user == None:
-        return Response(status_code=HTTP_400_BAD_REQUEST,
-                        media_type='application/json',
-                        content=json.dumps({"message": "NOT_VALID_TOKEN"}))
+        return not_valid_token()
     
     if len(group.name) == 0:
         return Response(status_code=HTTP_400_BAD_REQUEST,
@@ -54,15 +51,11 @@ def create_group(group: Group, token: str = Header(default=None)):
 @group_route.get('/All')
 def get_user_groups(token: str = Header(default=None)):
     if token == None:
-        return Response(status_code=HTTP_400_BAD_REQUEST,
-                        media_type='application/json',
-                        content=json.dumps({"message": "NOT_GIVEN_TOKEN"}))
+        return not_given_token()
     
     user = authenticate(token)
     if user == None:
-        return Response(status_code=HTTP_400_BAD_REQUEST,
-                        media_type='application/json',
-                        content=json.dumps({"message": "NOT_VALID_TOKEN"}))
+        return not_valid_token()
     
     groups = list(db.groups.find({"members": {"$elemMatch": {"id": user.id}}}))
     print(groups)
