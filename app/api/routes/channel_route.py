@@ -34,3 +34,24 @@ def create_channer(channel: Channel, token: str = Header(default=None)):
     channel_obj = parse_channel_from_mongo_dict(channel_result)
 
     return channel_obj
+
+@channel_route.get('/All/{group_id}')
+def get_all_channel_withing_group(group_id: str, token: str = Header(default=None)):
+    if token == None:
+        return Response(status_code=HTTP_400_BAD_REQUEST,
+                        media_type='application/json',
+                        content=json.dumps({"message": "NOT_GIVEN_TOKEN"}))
+    
+    user = authenticate(token)
+
+    if user == None:
+        return Response(status_code=HTTP_400_BAD_REQUEST,
+                        media_type='application/json',
+                        content=json.dumps({"message": "NOT_VALID_TOKEN"}))
+    
+    channels = list(db.channels.find({"group_id": group_id}))
+
+    channels_objs = [parse_channel_from_mongo_dict(ch) for ch in channels]
+    channel_dicts = [ch.model_dump() for ch in  channels_objs]
+
+    return channel_dicts
