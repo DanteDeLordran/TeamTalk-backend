@@ -6,7 +6,7 @@ from ...models.dto.user_login import UserLogin, build_login_dict
 from ...models.dto.user_at_client import parse_user_from_mongo_dict
 from ...db.db_context import db
 from ...auth.token_service import get_user_token, authenticate
-from ..services.validators import email_validator
+from ..services.validators import email_validator, password_validator
 import json
 
 users_route = APIRouter()
@@ -21,10 +21,16 @@ def register(userRegister: UserRegister):
                         media_type='application/json',
                         content=json.dumps({"message": "SOME_EMPY_FIELDS"}))
 
+    # Checking if email is valid
     if not email_validator(userRegister.email) or len(userRegister.email) < 5:
         return Response(status_code=HTTP_400_BAD_REQUEST,
                         media_type='application/json',
                         content=json.dumps({"message": "NOT_VALID_EMAIL"}))
+        
+    if not password_validator(userRegister.password):
+        return Response(status_code=HTTP_400_BAD_REQUEST,
+                        media_type='application/json',
+                        content=json.dumps({"message": "NOT_VALID_PASSWORD"}))
 
     matching_user = db.users.find_one(
         {"$or": [{"email": userRegister.email}, {"username": userRegister.username}]})
