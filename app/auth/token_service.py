@@ -39,5 +39,6 @@ def authenticate(token: str) -> UserClient | None:
         return None
     
     user_dict = db.users.find_one({"username": username, "email": email})
+    if user_dict == None: return None
     user = parse_user_from_mongo_dict(user_dict)
     return user

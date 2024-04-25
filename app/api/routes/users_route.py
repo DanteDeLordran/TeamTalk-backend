@@ -6,6 +6,7 @@ from ...models.dto.user_login import UserLogin, build_login_dict
 from ...models.dto.user_at_client import parse_user_from_mongo_dict
 from ...db.db_context import db
 from ...auth.token_service import get_user_token, authenticate
+from ..services.validators import email_validator, password_validator
 import json
 
 users_route = APIRouter()
@@ -13,12 +14,30 @@ users_route = APIRouter()
 
 @users_route.post('/register')
 def register(userRegister: UserRegister):
+
+    # Checking if any field is empy
+    if check_if_register_empty(userRegister):
+        return Response(status_code=HTTP_400_BAD_REQUEST,
+                        media_type='application/json',
+                        content=json.dumps({"message": "SOME_EMPY_FIELDS"}))
+
+    # Checking if email is valid
+    if not email_validator(userRegister.email) or len(userRegister.email) < 5:
+        return Response(status_code=HTTP_400_BAD_REQUEST,
+                        media_type='application/json',
+                        content=json.dumps({"message": "NOT_VALID_EMAIL"}))
+        
+    if not password_validator(userRegister.password):
+        return Response(status_code=HTTP_400_BAD_REQUEST,
+                        media_type='application/json',
+                        content=json.dumps({"message": "NOT_VALID_PASSWORD"}))
+
     matching_user = db.users.find_one(
         {"$or": [{"email": userRegister.email}, {"username": userRegister.username}]})
 
     if matching_user != None:
-        return Response(status_code=HTTP_400_BAD_REQUEST, 
-                        media_type='application/json', 
+        return Response(status_code=HTTP_400_BAD_REQUEST,
+                        media_type='application/json',
                         content=json.dumps({"message": "USER_EXISTS"}))
 
     db.users.insert_one(build_user_from_register(userRegister))
@@ -28,6 +47,17 @@ def register(userRegister: UserRegister):
 @users_route.post('/login')
 def login(userLogin: UserLogin):
     login_dict = build_login_dict(userLogin)
+    
+    if not email_validator(userLogin.email):
+        return Response(status_code=HTTP_400_BAD_REQUEST,
+                        media_type='application/json',
+                        content=json.dumps({"message": "NOT_VALID_EMAIL"}))
+    
+    if not password_validator(userLogin.password):
+        return Response(status_code=HTTP_400_BAD_REQUEST,
+                        media_type='application/json',
+                        content=json.dumps({"message": "NOT_VALID_PASSWORD"}))
+
     matched_user = db.users.find_one(login_dict)
 
     if matched_user == None:
@@ -50,5 +80,14 @@ def auth(token: str = Header(default=None)):
         return Response(status_code=HTTP_400_BAD_REQUEST,
                         media_type='application/json',
                         content=json.dumps({"message": "INVALID_TOKEN"}))
-    
+
     return user_result
+
+
+# Local Validators
+def check_if_register_empty(userRegister: UserRegister) -> bool:
+    return (len(userRegister.name) == 0
+            or len(userRegister.lastname) == 0
+            or len(userRegister.username) == 0
+            or len(userRegister.password) == 0
+            or len(userRegister.email) == 0)
