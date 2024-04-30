@@ -42,7 +42,7 @@ def register(userRegister: UserRegister):
                         content=json.dumps({"message": "USER_EXISTS"}))
 
     db.users.insert_one(build_user_from_register(userRegister))
-    return Response(status_code=HTTP_204_NO_CONTENT)
+    return Response(status_code=HTTP_201_CREATED)
 
 
 @users_route.post('/login')

@@ -1,17 +1,18 @@
+from datetime import datetime
 from fastapi import APIRouter, Response, Header
 from starlette.status import *
 from bson import ObjectId
 import json
 from ...db.db_context import db
 from ...auth.token_service import authenticate
-from ...models.group import Group, parse_group_from_mongo_dict, parse_group_to_mongo_dict
+from ...models.group import Group, GroupRequest, parse_group_from_mongo_dict, parse_group_to_mongo_dict
 from ...models.user_participant import UserParticipant
 from ..services.default_returns import not_given_token, not_valid_token
 
 group_route = APIRouter()
 
 @group_route.post('/create')
-def create_group(group: Group, token: str = Header(default=None)):
+def create_group(request: GroupRequest, token: str = Header(default=None)):
     if token == None:
         return not_given_token()
     
@@ -20,10 +21,14 @@ def create_group(group: Group, token: str = Header(default=None)):
     if user == None:
         return not_valid_token()
     
-    if len(group.name) == 0:
+    if len(request.name) == 0:
         return Response(status_code=HTTP_400_BAD_REQUEST,
                         media_type='appliation/json',
                         content=json.dumps({"message": "NOT_GIVEN_NAME"}))
+        
+    group = Group(
+        name= request.name
+    )
     
     # make user an admin participant
     admin = UserParticipant(
