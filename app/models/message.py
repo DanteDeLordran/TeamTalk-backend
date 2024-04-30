@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime
 
@@ -8,7 +8,12 @@ class Message(BaseModel):
     user_id : Optional[str] = None
     message : str
     channel_id: str
-    createdAt : datetime = datetime.now()
+    createdAt : datetime = Field(default=datetime.now())
+    
+class MessageRequest(BaseModel):
+    user_id : str
+    message : str
+    channel_id: str
     
 def parse_message_from_mongo_dict( message : dict ) -> Message:
     message_obj = Message(

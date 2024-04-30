@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Response, Header
 from starlette.status import *
-from ...models.message import Message, parse_message_to_mongo_dict, parse_message_from_mongo_dict
+from ...models.message import Message, MessageRequest, parse_message_to_mongo_dict, parse_message_from_mongo_dict
 from ...models.channel import parse_channel_from_mongo_dict
 from ...models.group import Group, parse_group_from_mongo_dict
 from ...models.role_definition import RoleDefinition
@@ -15,7 +15,7 @@ messages_route = APIRouter()
 
 
 @messages_route.post('/send')
-def send_message(message: Message, token: str = Header(default=None)):
+def send_message(request: MessageRequest, token: str = Header(default=None)):
     if token == None:
         return not_given_token()
 
@@ -23,10 +23,13 @@ def send_message(message: Message, token: str = Header(default=None)):
 
     if user is None:
         return not_valid_token()
+    
+    message = Message(
+        user_id= user.id,
+        message=request.message,
+        channel_id=request.channel_id
+    )
 
-    user_id = user.id
-
-    message.user_id = user_id
     message_dict = parse_message_to_mongo_dict(message)
 
     id = db.messages.insert_one(message_dict).inserted_id

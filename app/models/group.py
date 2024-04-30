@@ -17,6 +17,8 @@ class Group(BaseModel):
     ])
     creationDate: datetime = Field(default=datetime.now())
 
+class GroupRequest(BaseModel):
+    name : str = Field(min_length=2)
 
 def parse_group_from_mongo_dict(group: dict) -> Group:
     group_obj = Group(
