@@ -5,6 +5,10 @@ class Channel(BaseModel):
     id: Optional[str] = None
     group_id: str
     channel_name: str
+    
+class ChannelRequest(BaseModel):
+    group_id: str
+    channel_name : str
 
 def parse_channel_from_mongo_dict(channel: dict) -> Channel:
     channel_obj = Channel(
