@@ -34,7 +34,7 @@ def parse_group_from_mongo_dict(group: dict) -> Group:
 
 def parse_group_to_mongo_dict(group: Group) -> dict:
     group_dict = group.model_dump()
-    del group_dict["id"]
+    #del group_dict["id"]
 
     group_dict["creationDate"] = datetime.isoformat(group.creationDate)
     return group_dict
