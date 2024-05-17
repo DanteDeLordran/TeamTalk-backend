@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Response, Header
 from starlette.status import *
-from ...models.user import parse_user_from_mongo_dict
+from ...models.user import UserRequest, parse_user_from_mongo_dict
 from ...models.dto.user_register import UserRegister, build_user_from_register
 from ...models.dto.user_login import UserLogin, build_login_dict
 from ...models.dto.user_at_client import parse_user_from_mongo_dict
@@ -80,6 +80,16 @@ def auth(token: str = Header(default=None)):
 
     return user_result
 
+@users_route.put('/edit')
+async def edit_user( request : UserRequest , token : str = Header()):
+    user = authenticate(token)
+    
+    user.email = request.email
+    user.name = request.name
+    user.lastname = request.lastname
+    user.username = request.username
+    
+    db.users.update_one(user)
 
 # Local Validators
 def check_if_register_empty(userRegister: UserRegister) -> bool:

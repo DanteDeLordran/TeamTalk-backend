@@ -8,6 +8,12 @@ class User(BaseModel):
     username: str
     password: str
     email: str
+    
+class UserRequest(BaseModel):
+    name: str
+    lastname: str
+    username: str
+    email: str
 
 
 def parse_user_from_mongo_dict(user: dict) -> User:
