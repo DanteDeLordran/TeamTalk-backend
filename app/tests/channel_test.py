@@ -1,7 +1,5 @@
-from unittest.mock import MagicMock, patch
 from fastapi.testclient import TestClient
-import pytest
-from ..models.channel import Channel, ChannelRequest
+from ..models.channel import ChannelRequest
 from ..main import app
 import random
 
