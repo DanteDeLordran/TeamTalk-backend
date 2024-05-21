@@ -3,6 +3,7 @@ import uuid
 from fastapi.testclient import TestClient
 from ..models.dto.user_register import UserRegister
 from ..models.dto.user_login import UserLogin
+from ..models.user import UserRequest
 from ..main import app
 from dotenv import load_dotenv
 import os
@@ -12,7 +13,7 @@ load_dotenv()
 VALID_TOKEN = os.getenv("VALID_TOKEN")
 INVALID_TOKEN_EXPIRED = os.getenv("INVALID_TOKEN_EXPIRED")
 
-client = TestClient(app)
+client = TestClient(app=app)
 
 # MARK:Register tests
 
@@ -187,4 +188,88 @@ def test_authenticate_r3():
                          "token": VALID_TOKEN
                      }
                      )
+
+    assert res.status_code == 200
+    
+# MARK: Edit User
+
+user_request = UserRequest(
+    name='Example',
+    lastname='User',
+    username='ExampleUser',
+    email='example@gmail.com'
+)
+
+def test_edit_r1():
+    user = user_request.model_dump()
+    
+    res = client.put('/users/edit', json=user)
+    message = res.json()["message"]
+
+    assert res.status_code == 400 and message == 'NOT_GIVEN_TOKEN'
+
+
+def test_edit_r2():
+    user = user_request.model_dump()
+
+    res = client.put('/users/edit', 
+                     headers={
+                         'token': INVALID_TOKEN_EXPIRED
+                     },
+                     json=user)
+    
+    message = res.json()['message']
+    assert res.status_code == 400 and message == 'NOT_VALID_TOKEN'
+
+
+def test_edit_r3():
+    user = user_request.model_dump()
+    user["username"] = "ExistingUser"
+
+    res = client.put('/users/edit',
+                     headers={
+                         'token': VALID_TOKEN
+                     },
+                     json = user)
+    
+    message = res.json()["message"]
+    assert res.status_code == 400 and message == 'TAKEN_USERNAME'
+
+def test_edit_r4():
+    user = user_request.model_dump()
+    user["email"] = "existinguser@gmail.com"
+
+    res = client.put('/users/edit',
+                     headers={
+                         'token': VALID_TOKEN
+                     },
+                     json = user)
+    
+    message = res.json()["message"]
+    assert res.status_code == 400 and message == 'TAKEN_EMAIL'
+
+
+def test_edit_r5():
+    user = user_request.model_dump()
+    user["email"] = "existingusergmail.com"
+
+    res = client.put('/users/edit',
+                     headers={
+                         'token': VALID_TOKEN
+                     },
+                     json = user)
+    
+    message = res.json()["message"]
+    assert res.status_code == 400 and message == 'NOT_VALID_EMAIL'
+
+
+def test_edit_r6():
+    user = user_request.model_dump()
+
+    res = client.put('/users/edit',
+                     headers={
+                         'token': VALID_TOKEN
+                     },
+                     json = user)
+    
     assert res.status_code == 200
