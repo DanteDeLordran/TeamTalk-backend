@@ -79,6 +79,24 @@ def test_create_channel_R4():
     )
     assert res.status_code == 201
     
+def test_get_all_channels_R1():
+    res = client.get(
+        f'/channels/All/{group_id}',
+        headers={
+            
+        }
+    )
+    assert res.status_code == 400
+    
+def test_get_all_channels_R2():
+    res = client.get(
+        f'/channels/All/{group_id}',
+        headers={
+            'token': invalid_token
+        }
+    )
+    assert res.status_code == 400
+    
 def test_get_all_channels_R3():
     res = client.get(
         f'/channels/All/{group_id}',
