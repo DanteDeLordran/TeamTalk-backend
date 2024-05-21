@@ -35,7 +35,7 @@ def authenticate(token: str) -> UserClient | None:
 
     remaining_days = expiration - datetime.now()
 
-    if remaining_days.seconds < 0:
+    if remaining_days < timedelta(0):
         return None
     
     user_dict = db.users.find_one({"username": username, "email": email})
