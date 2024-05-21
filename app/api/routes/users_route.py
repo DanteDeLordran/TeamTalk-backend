@@ -21,7 +21,7 @@ def register(userRegister: UserRegister):
     if check_if_register_empty(userRegister):
         return Response(status_code=HTTP_400_BAD_REQUEST,
                         media_type='application/json',
-                        content=json.dumps({"message": "SOME_EMPY_FIELDS"}))
+                        content=json.dumps({"message": "SOME_EMPTY_FIELDS"}))
 
     # Checking if email is valid
     if not email_validator(userRegister.email) or len(userRegister.email) < 5:
