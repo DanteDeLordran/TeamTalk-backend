@@ -21,9 +21,9 @@ def create_group(request: GroupRequest, token: str = Header(default=None)):
     if user == None:
         return not_valid_token()
     
-    if len(request.name) == 0:
+    if len(request.name) < 2:
         return Response(status_code=HTTP_400_BAD_REQUEST,
-                        media_type='appliation/json',
+                        media_type='application/json',
                         content=json.dumps({"message": "NOT_GIVEN_NAME"}))
         
     group = Group(
