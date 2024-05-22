@@ -78,6 +78,8 @@ def test_create_group_r4():
     
     assert res.status_code == 200
     
+# MARK: Get User Groups Tests
+
 
 def test_get_user_groups_r1():
     res = client.get('/groups/All')
