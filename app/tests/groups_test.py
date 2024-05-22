@@ -78,3 +78,30 @@ def test_create_group_r4():
     
     assert res.status_code == 200
     
+
+def test_get_user_groups_r1():
+    res = client.get('/groups/All')
+
+    message = res.json()["message"]
+
+    assert res.status_code == 400 and message == 'NOT_GIVEN_TOKEN'
+
+
+def test_get_user_groups_r2():
+    res = client.get('/groups/All',
+                     headers={
+                         'token': INVALID_TOKEN_EXPIRED
+                     })
+    
+    message = res.json()["message"]
+
+    assert res.status_code == 400 and message == 'NOT_VALID_TOKEN'
+
+
+def test_get_user_groups_r3():
+    res = client.get('/groups/All',
+                     headers={
+                         'token': VALID_TOKEN
+                     })
+
+    assert res.status_code == 200
